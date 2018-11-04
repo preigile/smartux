@@ -1,3 +1,5 @@
+import {Smartux} from "../index";
+
 // type of actions
 const INCREASE = 'INCREASE';
 const DECREASE = 'DECREASE';
@@ -37,7 +39,7 @@ const Counter = function (subscribeToStore, increase, decrease) {
 };
 
 // Smartux API
-const { createAction, createSubscriber } = Smartux.create();
+const { createAction, createSubscriber } = Smartux;
 
 // creating the subscribers and the actions
 const counterStoreSubscriber = createSubscriber(CounterStore);
