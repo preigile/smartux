@@ -1,56 +1,62 @@
-class Dispatcher {
-    constructor() {}
+export class Dispatcher {
 
-    private stores: Array<any>;
+    constructor(
+        private store: any
+    ) {};
 
-    register(store): any {
+    register(store): (cons: (store: any) => void, noInit: boolean) => void {
         if (!store || !store.update) {
             throw new Error('You should provide a store that has an `update` method.');
         } else {
             let consumers = [];
-            let change = function () {
-                consumers.forEach(function (consumer) {
+
+            let change = () => {
+                consumers.forEach((consumer) => {
                     consumer(store);
                 });
             };
-            let subscribe = function (consumer, noInit) {
-                consumer = consumer.constructor === Array ? consumer : [consumer];
+
+            let subscribe = (consumer) => {
                 consumers = consumers.concat(consumer);
-                if (!noInit) {
-                    consumer.forEach(function (c) {
-                        c(store);
-                    });
-                }
+                consumers.forEach((c) => {
+                    c(store);
+                });
             };
 
-            this.stores.push({ store: store, change: change });
+            this.store = {state: store, change: change};
+
             return subscribe;
         }
     }
 
     dispatch(action): any {
-        if (this.stores.length > 0) {
-            this.stores.forEach(function (entry) {
-                entry.store.update(action, entry.change);
-            });
+        if (this.store) {
+            this.store.state.update(action, this.store.change);
         }
     }
 }
 
 export class Smartux {
-    constructor(private dispatcher: Dispatcher) {}
 
-    createAction(type): any {
-        if (!type) {
-            throw new Error('Please, provide action\'s type.');
-        } else {
-            return (payload) => {
-                return this.dispatcher.dispatch({ type: type, payload: payload });
+    constructor(
+        private dispatcher: Dispatcher
+    ) {}
+
+    create(): any {
+        return {
+            createAction: (type) => {
+                if (!type) {
+                    throw new Error('Please, provide action\'s type.');
+                } else {
+                    return (payload) => {
+                        return this.dispatcher.dispatch({type: type, payload: payload});
+                    }
+                }
+            },
+
+            createSubscriber: (store) => {
+                return this.dispatcher.register(store);
             }
         }
-    }
-
-    createSubscriber(store): any {
-        return this.dispatcher.register(store);
     }
 }
