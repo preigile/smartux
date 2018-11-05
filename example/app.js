@@ -1,5 +1,4 @@
-import {Smartux} from "../index";
-import {Dispatcher} from "../index";
+import {Smartux, Dispatcher} from "../index";
 
 // type of actions
 const INCREASE = 'INCREASE';
@@ -15,9 +14,9 @@ const store = {
 
     update: function (action, change) {
         if (action.type === INCREASE) {
-            this._state.value += 1;
+            this._state.value += action.payload;
         } else if (action.type === DECREASE) {
-            this._state.value -= 1;
+            this._state.value -= action.payload;
         }
         change();
     }
@@ -45,8 +44,8 @@ const {createAction, createSubscriber} = new Smartux(new Dispatcher(store)).crea
 // creating the subscribers and the actions
 const storeSubscriber = createSubscriber(store);
 const actions = {
-    increase: createAction(INCREASE),
-    decrease: createAction(DECREASE)
+    increase: createAction(INCREASE, 1),
+    decrease: createAction(DECREASE, 2)
 };
 
 Counter(storeSubscriber, actions.increase, actions.decrease);

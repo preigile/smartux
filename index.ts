@@ -44,11 +44,11 @@ export class Smartux {
 
     create(): any {
         return {
-            createAction: (type) => {
+            createAction: (type, payload) => {
                 if (!type) {
                     throw new Error('Please, provide action\'s type.');
                 } else {
-                    return (payload) => {
+                    return () => {
                         return this.dispatcher.dispatch({type: type, payload: payload});
                     }
                 }
